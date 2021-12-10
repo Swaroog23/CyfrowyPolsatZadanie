@@ -7,7 +7,11 @@ from .publisher import (
 import asyncio
 
 async def get_value_from_key_async(request):
-    print(request.body_exists)
+    key = request.match_info["id"]
+    connection, channel = await establish_connection_and_channel("localhost")
+    exchange = await publisher_declare_exchange(channel, "get")
+    await publish_message_to_exchange(exchange, key, "get")
+    await connection.close()
     return web.Response(text=f"hello!")
 
 

@@ -1,3 +1,5 @@
+from Database.database import get_data_from_db, insert_data_to_db
+from ast import literal_eval
 import aio_pika
 
 
@@ -17,6 +19,17 @@ async def consumer_declare_exchage_and_queue(channel, exchange_name):
     return queue
 
 
-async def consumer_process_message(message):
+async def consumer_process_post_message(message):
     async with message.process():
+        data = literal_eval(message.body.decode("utf-8"))
+        print(f"MESSAGE RECIVED: {data.keys()}")
+        for key, value in data.items():
+            insert_data_to_db(key, value)
+
+
+async def consumer_process_get_message(message):
+    async with message.process():
+        key = message.body.decode("utf-8")
+        db_result = get_data_from_db(key)
+        print(db_result)
         print(f"MESSAGE RECIVED: {message.body}")
