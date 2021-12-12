@@ -1,18 +1,33 @@
+from asyncio import futures
+import pickle
 import aio_pika
+import uuid
 
 
-async def establish_connection_and_channel(host=""):
-    connection = await aio_pika.connect_robust()
+async def establish_connection_and_channel(loop):
+    connection = await aio_pika.connect_robust(loop=loop)
     channel = await connection.channel()
-    return [connection, channel]
+    return channel
 
 
-async def publisher_declare_exchange(channel, exchange_name):
-    exchange = await channel.declare_exchange(exchange_name)
-    return exchange
+async def publisher_declare_queue(channel):
+    queue = await channel.declare_queue(exclusive=True)
+    return queue
 
 
-async def publish_message_to_exchange(exchange, message, routing_key):
-    await exchange.publish(
-        aio_pika.Message(body="{}".format(message).encode()), routing_key
+async def publish_message_to_queue(channel, message, routing_key, callback_queue):
+    correlation_id = str(uuid.uuid4())
+    await channel.default_exchange.publish(
+        aio_pika.Message(
+            body="{}".format(message).encode(),
+            correlation_id=correlation_id,
+            reply_to=callback_queue.name,
+        ),
+        routing_key,
     )
+    return correlation_id
+
+
+async def publisher_queue_consume_callback(future, message):
+    with message.process():
+        future.set_result(pickle.loads(message.body))

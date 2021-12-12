@@ -1,22 +1,25 @@
 from Database.database import create_database_and_tables
 from consumer import (
-    consumer_declare_exchage_and_queue,
+    consumer_declare_queue,
     consumer_establish_connection_and_channel,
     consumer_process_get_message,
     consumer_process_post_message
     )
+from functools import partial
 import asyncio
 
 
 async def main(loop):
     connection, channel = await consumer_establish_connection_and_channel(loop=loop)
     await channel.set_qos(prefetch_count=100)
+    post_queue = await consumer_declare_queue(channel, "post")
+    get_queue = await consumer_declare_queue(channel, "get")
 
-    post_queue = await consumer_declare_exchage_and_queue(channel, "post")
-    get_queue = await consumer_declare_exchage_and_queue(channel, "get")
-    await post_queue.consume(consumer_process_post_message, exclusive=True)
-    await get_queue.consume(consumer_process_get_message, exclusive=True)
-    print("WAITING FOR MESSAGES")
+    await post_queue.consume(consumer_process_post_message)
+    await get_queue.consume(partial(
+        consumer_process_get_message, channel.default_exchange
+        ))
+
     return connection
 
 

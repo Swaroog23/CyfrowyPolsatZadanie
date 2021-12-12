@@ -9,5 +9,3 @@ app.add_routes(
         web.post("/add-value", post_key_value_async),
     ]
 )
-
-web.run_app(app)
