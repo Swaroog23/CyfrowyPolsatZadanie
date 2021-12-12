@@ -6,7 +6,7 @@ from .publisher import (
     publisher_queue_consume_callback,
 )
 from functools import partial
-from .validators import validate_request_data 
+from .validators import validate_request_data
 import json
 
 
@@ -22,7 +22,11 @@ async def get_value_from_key_async(request):
     await queue.consume(partial(publisher_queue_consume_callback, future))
 
     result = await future
-    return web.Response(text=f"{result}")
+    if result is None:
+        return web.HTTPBadRequest(
+            text="400: Object with this key does not exists"
+            )
+    return web.Response(text=f"{json.dumps(result[0])}")
 
 
 async def post_key_value_async(request):
@@ -41,4 +45,11 @@ async def post_key_value_async(request):
     queue = await publisher_declare_queue(channel)
 
     await publish_message_to_queue(channel, str(body), "post", queue)
+    await queue.consume(partial(publisher_queue_consume_callback, future))
+
+    result = await future
+    if result is not None:
+        return web.HTTPBadRequest(
+            text="400: Object with this key already exists!"
+            )
     return web.Response(text=f"Data saved: {body}")

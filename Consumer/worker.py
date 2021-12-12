@@ -15,7 +15,7 @@ async def main(loop):
     post_queue = await consumer_declare_queue(channel, "post")
     get_queue = await consumer_declare_queue(channel, "get")
 
-    await post_queue.consume(consumer_process_post_message)
+    await post_queue.consume(partial(consumer_process_post_message, channel.default_exchange))
     await get_queue.consume(partial(
         consumer_process_get_message, channel.default_exchange
         ))
