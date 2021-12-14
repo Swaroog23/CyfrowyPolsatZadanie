@@ -4,8 +4,8 @@ import aio_pika
 import uuid
 
 
-async def establish_connection_and_channel(loop):
-    connection = await aio_pika.connect_robust(loop=loop)
+async def establish_connection_and_channel(loop, host):
+    connection = await aio_pika.connect_robust(host=host,loop=loop)
     channel = await connection.channel()
     return channel
 
@@ -31,3 +31,7 @@ async def publish_message_to_queue(channel, message, routing_key, callback_queue
 async def publisher_queue_consume_callback(future, message):
     with message.process():
         future.set_result(pickle.loads(message.body))
+
+
+if __name__ == "__main__":
+    pass

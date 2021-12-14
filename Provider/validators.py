@@ -4,3 +4,7 @@ def validate_request_data(data):
             raise ValueError("Key must be numeric")
         elif value is None:
             raise ValueError("Value cannot be empty!")
+
+
+if __name__ == "__main__":
+    pass

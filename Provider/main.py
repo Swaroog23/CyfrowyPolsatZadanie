@@ -1,4 +1,4 @@
-from Provider.urls import app
+from urls import app
 from aiohttp import web
 
 if __name__ == "__main__":

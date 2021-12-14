@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    image: rabbitmq
+    command: rabbitmq-server
+    expose:
+      - 5672
+      - 15672
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 20s
+      retries: 5
+
+  database:
+    image: nouchka/sqlite3
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./db/:/root/db/
+
+  client:
+    container_name: client
+    build:
+      context: ./Provider/
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  worker:
+    container_name: worker
+    build:
+      context: ./Consumer/
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy

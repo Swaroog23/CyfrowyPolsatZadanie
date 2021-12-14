@@ -4,11 +4,8 @@ import aio_pika
 import pickle
 
 
-async def consumer_establish_connection_and_channel(loop=None):
-    if loop is not None:
-        connection = await aio_pika.connect_robust(loop=loop)
-    else:
-        connection = await aio_pika.connect_robust()
+async def consumer_establish_connection_and_channel(loop, host):
+    connection = await aio_pika.connect_robust(host=host,loop=loop)
     channel = await connection.channel()
     return [connection, channel]
 

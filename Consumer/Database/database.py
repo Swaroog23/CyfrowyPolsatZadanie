@@ -1,8 +1,10 @@
 import sqlite3
 
+from Consumer.consts import DATABASE_URI
+
 
 def create_database_and_tables():
-    with sqlite3.connect("key_value.db") as sql_conn:
+    with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         try:
             cursor.execute("""
