@@ -1,5 +1,5 @@
-from Consumer.consts import QUEUE_GET_NAME, QUEUE_POST_NAME, RABBIT_HOST_NAME
-from Database.database import create_database_and_tables
+from consts import QUEUE_GET_NAME, QUEUE_POST_NAME, RABBIT_HOST_NAME
+from Database.database import create_database_and_tables_if_not_exists
 from consumer import (
     consumer_declare_queue,
     consumer_establish_connection_and_channel,
@@ -31,7 +31,7 @@ async def main(loop):
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     connection = loop.run_until_complete(main(loop))
-    create_database_and_tables()
+    create_database_and_tables_if_not_exists()
     try:
         loop.run_forever()
     finally:

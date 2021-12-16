@@ -13,13 +13,6 @@ services:
       timeout: 20s
       retries: 5
 
-  database:
-    image: nouchka/sqlite3
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./db/:/root/db/
-
   client:
     container_name: client
     build:

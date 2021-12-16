@@ -18,12 +18,14 @@ async def consumer_declare_queue(channel, queue_name):
 async def consumer_process_post_message(exchange, message):
     async with message.process():
         data = literal_eval(message.body.decode("utf-8"))
+        result_list = []
         for key, value in data.items():
-            result = insert_data_to_db(key, value)
-            await exchange.publish(
-                aio_pika.Message(body=pickle.dumps(result), correlation_id=message.correlation_id),
-                routing_key=message.reply_to,
-            )
+            result_list.append(insert_data_to_db(key, value))
+
+        await exchange.publish(
+            aio_pika.Message(body=pickle.dumps(result_list), correlation_id=message.correlation_id),
+            routing_key=message.reply_to,
+        )
 
 
 async def consumer_process_get_message(exchange, message):
