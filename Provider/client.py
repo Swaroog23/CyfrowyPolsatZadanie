@@ -1,10 +1,10 @@
 from consts import QUEUE_GET_NAME, QUEUE_POST_NAME, RABBIT_HOST_NAME
 from aiohttp import web
-from publisher import (
-    publisher_establish_connection_and_channel,
-    publisher_send_message_to_queue,
-    publisher_declare_queue,
-    publisher_queue_consume_callback,
+from Provider.provider import (
+    provider_establish_connection_and_channel,
+    provider_send_message_to_queue,
+    provider_declare_queue,
+    provider_queue_consume_callback,
 )
 from functools import partial
 from validators import validate_request_data, validate_result_from_queue
@@ -16,11 +16,11 @@ async def get_value_from_key_async(request):
     loop = request.loop
     future = loop.create_future()
 
-    channel = await publisher_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
-    queue = await publisher_declare_queue(channel)
+    channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
+    queue = await provider_declare_queue(channel)
 
-    await publisher_send_message_to_queue(channel, key, QUEUE_GET_NAME , queue)
-    await queue.consume(partial(publisher_queue_consume_callback, future))
+    await provider_send_message_to_queue(channel, key, QUEUE_GET_NAME , queue)
+    await queue.consume(partial(provider_queue_consume_callback, future))
 
     result = await future
     if result is None:
@@ -42,12 +42,12 @@ async def post_key_value_from_body_async(request):
             text="400: Not acceptable data format. Key must be numeric and value cannot be null"
             )
 
-    channel = await publisher_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
-    queue = await publisher_declare_queue(channel)
+    channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
+    queue = await provider_declare_queue(channel)
 
-    await publisher_send_message_to_queue(channel, str(body), QUEUE_POST_NAME, queue)
+    await provider_send_message_to_queue(channel, str(body), QUEUE_POST_NAME, queue)
 
-    await queue.consume(partial(publisher_queue_consume_callback, future))
+    await queue.consume(partial(provider_queue_consume_callback, future))
 
     result_list = await future
 

@@ -4,18 +4,18 @@ import aio_pika
 import uuid
 
 
-async def publisher_establish_connection_and_channel(loop, host):
+async def provider_establish_connection_and_channel(loop, host):
     connection = await aio_pika.connect_robust(host=host,loop=loop)
     channel = await connection.channel()
     return channel
 
 
-async def publisher_declare_queue(channel):
+async def provider_declare_queue(channel):
     queue = await channel.declare_queue(exclusive=True)
     return queue
 
 
-async def publisher_send_message_to_queue(channel, message, routing_key, callback_queue):
+async def provider_send_message_to_queue(channel, message, routing_key, callback_queue):
     correlation_id = str(uuid.uuid4())
     await channel.default_exchange.publish(
         aio_pika.Message(
@@ -28,7 +28,7 @@ async def publisher_send_message_to_queue(channel, message, routing_key, callbac
     return correlation_id
 
 
-async def publisher_queue_consume_callback(future, message):
+async def provider_queue_consume_callback(future, message):
     with message.process():
         return future.set_result(pickle.loads(message.body))
 
