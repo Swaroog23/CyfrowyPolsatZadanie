@@ -5,7 +5,7 @@ import pickle
 
 
 async def consumer_establish_connection_and_channel(loop, host):
-    connection = await aio_pika.connect_robust(host=host,loop=loop)
+    connection = await aio_pika.connect_robust(host=host, loop=loop)
     channel = await connection.channel()
     return [connection, channel]
 
@@ -23,7 +23,9 @@ async def consumer_process_post_message(exchange, message):
             result_list.append(insert_data_to_db(key, value))
 
         await exchange.publish(
-            aio_pika.Message(body=pickle.dumps(result_list), correlation_id=message.correlation_id),
+            aio_pika.Message(
+                body=pickle.dumps(result_list), correlation_id=message.correlation_id
+            ),
             routing_key=message.reply_to,
         )
 
@@ -34,6 +36,8 @@ async def consumer_process_get_message(exchange, message):
         db_result = get_data_from_db(key)
 
         await exchange.publish(
-            aio_pika.Message(body=pickle.dumps(db_result), correlation_id=message.correlation_id),
+            aio_pika.Message(
+                body=pickle.dumps(db_result), correlation_id=message.correlation_id
+            ),
             routing_key=message.reply_to,
         )

@@ -19,14 +19,12 @@ async def get_value_from_key_async(request):
     channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
     queue = await provider_declare_queue(channel)
 
-    await provider_send_message_to_queue(channel, key, QUEUE_GET_NAME , queue)
+    await provider_send_message_to_queue(channel, key, QUEUE_GET_NAME, queue)
     await queue.consume(partial(provider_queue_consume_callback, future))
 
     result = await future
     if result is None:
-        return web.HTTPBadRequest(
-            text="400: Object with this key does not exists"
-            )
+        return web.HTTPBadRequest(text="400: Object with this key does not exists")
     return web.Response(text=f"{json.dumps(result[0])}")
 
 
@@ -40,7 +38,7 @@ async def post_key_value_from_body_async(request):
     except ValueError:
         return web.HTTPBadRequest(
             text="400: Not acceptable data format. Key must be numeric and value cannot be null"
-            )
+        )
 
     channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
     queue = await provider_declare_queue(channel)
@@ -54,9 +52,7 @@ async def post_key_value_from_body_async(request):
     try:
         validate_result_from_queue(result_list)
     except ValueError:
-        return web.HTTPBadRequest(
-                text="400: Object with this key already exists!"
-                )
+        return web.HTTPBadRequest(text="400: Object with this key already exists!")
 
     return web.Response(text=f"Data saved: {body}")
 

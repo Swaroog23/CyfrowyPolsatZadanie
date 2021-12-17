@@ -5,7 +5,7 @@ import uuid
 
 
 async def provider_establish_connection_and_channel(loop, host):
-    connection = await aio_pika.connect_robust(host=host,loop=loop)
+    connection = await aio_pika.connect_robust(host=host, loop=loop)
     channel = await connection.channel()
     return channel
 

@@ -2,25 +2,31 @@ import sqlite3
 
 from consts import DATABASE_URI
 
+
 def create_database_and_tables_if_not_exists():
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                         CREATE TABLE key_values (
                             key INTEGER PRIMARY KEY,
                             value TEXT NOT NULL
                         )
-                        """)
+                        """
+            )
         except sqlite3.OperationalError:
             pass
+
 
 def insert_data_to_db(key, value):
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         try:
-            cursor.execute("INSERT INTO key_values VALUES (:key, :value)",
-                            {'key': key, 'value': value})
+            cursor.execute(
+                "INSERT INTO key_values VALUES (:key, :value)",
+                {"key": key, "value": value},
+            )
             return None
         except sqlite3.IntegrityError as error:
             return error
@@ -29,6 +35,5 @@ def insert_data_to_db(key, value):
 def get_data_from_db(key):
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
-        cursor.execute("SELECT value FROM key_values WHERE key=:key",
-                        {'key': key})
+        cursor.execute("SELECT value FROM key_values WHERE key=:key", {"key": key})
         return cursor.fetchone()
