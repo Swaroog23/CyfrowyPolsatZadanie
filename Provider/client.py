@@ -1,10 +1,7 @@
-from consts import QUEUE_GET_NAME, QUEUE_POST_NAME, RABBIT_HOST_NAME
+from consts import QUEUE_GET_NAME, QUEUE_POST_NAME
 from aiohttp import web
-from Provider.provider import (
-    provider_establish_connection_and_channel,
-    provider_send_message_to_queue,
-    provider_declare_queue,
-    provider_queue_consume_callback,
+from provider import (
+    provider_send_message_and_await_response,
 )
 from functools import partial
 from validators import validate_request_data, validate_result_from_queue
@@ -13,25 +10,18 @@ import json
 
 async def get_value_from_key_async(request):
     key = request.match_info["id"]
-    loop = request.loop
-    future = loop.create_future()
 
-    channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
-    queue = await provider_declare_queue(channel)
+    server_response = await provider_send_message_and_await_response(
+        loop=request.loop, message=key, queue_name=QUEUE_GET_NAME
+    )
 
-    await provider_send_message_to_queue(channel, key, QUEUE_GET_NAME, queue)
-    await queue.consume(partial(provider_queue_consume_callback, future))
-
-    result = await future
-    if result is None:
+    if server_response is None:
         return web.HTTPBadRequest(text="400: Object with this key does not exists")
-    return web.Response(text=f"{json.dumps(result[0])}")
+    return web.Response(text=f"{json.dumps(server_response[0])}")
 
 
 async def post_key_value_from_body_async(request):
     body = await request.json()
-    loop = request.loop
-    future = loop.create_future()
 
     try:
         validate_request_data(body)
@@ -40,17 +30,12 @@ async def post_key_value_from_body_async(request):
             text="400: Not acceptable data format. Key must be numeric and value cannot be null"
         )
 
-    channel = await provider_establish_connection_and_channel(loop, RABBIT_HOST_NAME)
-    queue = await provider_declare_queue(channel)
-
-    await provider_send_message_to_queue(channel, str(body), QUEUE_POST_NAME, queue)
-
-    await queue.consume(partial(provider_queue_consume_callback, future))
-
-    result_list = await future
+    server_response = await provider_send_message_and_await_response(
+        loop=request.loop, message=body, queue_name=QUEUE_POST_NAME
+    )
 
     try:
-        validate_result_from_queue(result_list)
+        validate_result_from_queue(server_response)
     except ValueError:
         return web.HTTPBadRequest(text="400: Object with this key already exists!")
 

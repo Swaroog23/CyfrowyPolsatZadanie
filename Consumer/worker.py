@@ -12,13 +12,15 @@ import asyncio
 
 async def main(loop):
     connection, channel = await consumer_establish_connection_and_channel(
-        loop, RABBIT_HOST_NAME
+        loop=loop, host=RABBIT_HOST_NAME
     )
 
     await channel.set_qos(prefetch_count=100)
 
-    post_queue = await consumer_declare_queue(channel, QUEUE_POST_NAME)
-    get_queue = await consumer_declare_queue(channel, QUEUE_GET_NAME)
+    post_queue = await consumer_declare_queue(
+        channel=channel, queue_name=QUEUE_POST_NAME
+    )
+    get_queue = await consumer_declare_queue(channel=channel, queue_name=QUEUE_GET_NAME)
 
     await post_queue.consume(
         partial(consumer_process_post_message, channel.default_exchange)
