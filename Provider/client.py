@@ -12,7 +12,7 @@ async def get_value_from_key_async(request):
     key = request.match_info["id"]
 
     server_response = await provider_send_message_and_await_response(
-        loop=request.loop, message=key, queue_name=QUEUE_GET_NAME
+        async_loop=request.loop, message=key, queue_name=QUEUE_GET_NAME
     )
 
     if server_response is None:
@@ -31,7 +31,7 @@ async def post_key_value_from_body_async(request):
         )
 
     server_response = await provider_send_message_and_await_response(
-        loop=request.loop, message=body, queue_name=QUEUE_POST_NAME
+        async_loop=request.loop, message=body, queue_name=QUEUE_POST_NAME
     )
 
     try:

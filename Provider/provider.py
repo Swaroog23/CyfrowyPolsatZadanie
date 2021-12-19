@@ -34,10 +34,10 @@ async def provider_queue_consume_callback(future, message):
 
 
 async def provider_send_message_and_await_response(
-    loop, message, queue_name, host=RABBIT_HOST_NAME
+    async_loop, message, queue_name, host=RABBIT_HOST_NAME
 ):
-    future = loop.create_future()
-    channel = await provider_establish_connection_and_channel(loop, host)
+    future = async_loop.create_future()
+    channel = await provider_establish_connection_and_channel(async_loop, host)
     queue = await provider_declare_queue(channel)
 
     await provider_send_message(channel, str(message), queue_name, queue)

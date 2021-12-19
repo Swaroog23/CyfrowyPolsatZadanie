@@ -23,7 +23,7 @@ def insert_data_to_db(key, value):
         try:
             cursor.execute(
                 "INSERT INTO key_values (key, value) VALUES (:key, :value)",
-                {"key": key, "value": value},
+                {"key": key, "value": str(value)},
             )
             return None
         except sqlite3.IntegrityError as error:
