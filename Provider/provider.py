@@ -18,13 +18,11 @@ async def provider_establish_connection_and_channel_async(
     async_loop: asyncio.AbstractEventLoop, host: str
 ) -> Channel:
     connection = await connect_robust(host=host, loop=async_loop)
-    channel = await connection.channel()
-    return channel
+    return await connection.channel()
 
 
 async def provider_declare_queue_async(channel: Channel) -> Queue:
-    queue = await channel.declare_queue(exclusive=True, durable=True)
-    return queue
+    return await channel.declare_queue(exclusive=True, durable=True)
 
 
 async def provider_send_message_async(

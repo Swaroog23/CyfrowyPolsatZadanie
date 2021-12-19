@@ -23,8 +23,7 @@ async def consumer_establish_connection_and_channel_async(
 
 
 async def consumer_declare_queue_async(channel: Channel, queue_name: str) -> Queue:
-    queue = await channel.declare_queue(queue_name, durable=True)
-    return queue
+    return await channel.declare_queue(queue_name, durable=True)
 
 
 async def consumer_process_post_message_async(
