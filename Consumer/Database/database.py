@@ -1,9 +1,9 @@
 import sqlite3
-
 from consts import DATABASE_URI
+from typing import Any
 
 
-def create_database_and_tables_if_not_exists():
+def create_database_and_tables_if_not_exists() -> None:
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         cursor.execute(
@@ -17,7 +17,7 @@ def create_database_and_tables_if_not_exists():
         )
 
 
-def insert_data_to_db(key, value):
+def insert_data_to_db(key: str, value: Any) -> None:
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         try:
@@ -33,7 +33,7 @@ def insert_data_to_db(key, value):
             insert_data_to_db(key, value)
 
 
-def get_data_from_db(key):
+def get_data_from_db(key: str) -> Any:
     with sqlite3.connect(DATABASE_URI) as sql_conn:
         cursor = sql_conn.cursor()
         cursor.execute("SELECT value FROM key_values WHERE key=:key", {"key": key})
