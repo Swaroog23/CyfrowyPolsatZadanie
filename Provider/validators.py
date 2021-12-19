@@ -2,11 +2,11 @@ def validate_request_data(data):
     if data:
         for key, value in data.items():
             if not key.isnumeric():
-                raise ValueError("Key must be numeric")
+                raise ValueError()
             elif value is None:
-                raise ValueError("Value cannot be empty!")
+                raise ValueError()
     else:
-        raise ValueError("Data cannot be empty!")
+        raise ValueError()
 
 
 def validate_result_from_queue(result_list):

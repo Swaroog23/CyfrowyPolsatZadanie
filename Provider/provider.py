@@ -16,7 +16,7 @@ async def provider_declare_queue(channel):
     return queue
 
 
-async def provider_send_message_to_queue(channel, message, routing_key, callback_queue):
+async def provider_send_message(channel, message, routing_key, callback_queue):
     await channel.default_exchange.publish(
         Message(
             body="{}".format(message).encode(),
@@ -40,7 +40,7 @@ async def provider_send_message_and_await_response(
     channel = await provider_establish_connection_and_channel(loop, host)
     queue = await provider_declare_queue(channel)
 
-    await provider_send_message_to_queue(channel, str(message), queue_name, queue)
+    await provider_send_message(channel, str(message), queue_name, queue)
 
     await queue.consume(partial(provider_queue_consume_callback, future))
     return await future
