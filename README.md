@@ -11,6 +11,7 @@ Provider accepts GET and POST request, then sends them via RabbitMQ to Consumer,
 The main dependencies in this project are:
  - Aio-pika - for connection to RabbitMQ
  - Aiohttp - for web client
+ Other dependencies are contained in requierments.txt
 
 ## Structure
 There are two apps inside this repository: Provider and Consumer.
@@ -36,5 +37,5 @@ App are contenerized via docker. Docker-compose contains everything needed to st
 To comunicate with the app, use something like Postman or Insomnia.
 
 The url's are:
- - GET: /get-value/<key> - returns value under give key from database. If key does not exists, returns HTTP 400
- - POST: /add-valie/ - saves data to database, if body of a request is in correct format (accepts json, key must be numeric string and value cannot be null). If data is saved, app will inform user that data is saved, else returns HTTP 400
+ - GET: /get-value/<key> - returns value under give key from database. If key does not exists, returns HTTP 400. Key must be a number, otherwise app returns 404.
+ - POST: /add-valie/ - saves data to database, if body of a request is in correct format (accepts json, key must be numeric string and value cannot be null). If data is saved, app will inform user that data is saved, else returns HTTP 400.
