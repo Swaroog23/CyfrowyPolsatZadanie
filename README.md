@@ -1,6 +1,3 @@
-# CyfrowyPolsatZadanie
-Recruitment task for Cyfrowy Polsat.
-
 ## Overview
 This repo contains two apps: Consumer and Provider.
 They communicate through RabbitMQ.
